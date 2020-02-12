@@ -28,5 +28,6 @@ public class MessageExchanger
 		if(aliceKey != bobKey) throw new Exception("Secret keys are not the same");
 		
 		System.out.println("Secret Key: " + aliceKey);
+		System.out.println("End of Exercise");
 	}
 }
