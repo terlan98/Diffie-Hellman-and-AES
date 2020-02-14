@@ -7,8 +7,8 @@ import java.util.Random;
  */
 public class DHKeyExchanger
 {
-	private int p, alpha;
-	private int publicKey, privateKey;
+	private long p, alpha;
+	private long publicKey, privateKey;
 	private Random rnd = new Random();
 	
 	public DHKeyExchanger(int p, int alpha)
@@ -17,17 +17,17 @@ public class DHKeyExchanger
 		this.p = p;
 		
 		privateKey = rnd.nextInt(p);
-		publicKey = (int) (Math.pow(alpha, privateKey) % p);
+		publicKey = (long) (Math.pow(alpha, privateKey) % p);
 		
 		System.out.println("Private Key: " + privateKey + " Public Key: " + publicKey);
 	}
 	
-	public int getSecretKey(int publicKey)
+	public long getSecretKey(long publicKey)
 	{
-		return (int) (Math.pow(publicKey, privateKey) % p);
+		return (long) (Math.pow(publicKey, privateKey) % p);
 	}
 	
-	public int getPublicKey()
+	public long getPublicKey()
 	{
 		return publicKey;
 	}

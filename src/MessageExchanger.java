@@ -4,16 +4,19 @@ public class MessageExchanger
 {
 	public static void main(String[] args) throws java.lang.Exception
 	{
+		CBCOverAES cbc = new CBCOverAES("111111111111");
+		
 		Scanner scanner = new Scanner(System.in);
 		String plainText = scanner.next();
 		scanner.close();
 		
-		String enc = AES.encrypt(plainText, "key");
-		String dec = AES.decrypt(enc, "key");
 		
-		System.out.println("Ciphertext: " + enc);
+		String cipher = cbc.encrypt(plainText);
+		String dec = cbc.decrypt(cipher);
+		
+		System.out.println("Ciphertext: " + cipher);
 		System.out.println("Decrypted plaintext: " + dec + '\n');
-		System.out.println("Initial Vector: " + AES.getInitVector() + '\n');
+		System.out.println("Initial Vector: " + CBCOverAES.getInitVector() + '\n');
 		
 		System.out.print("Alice's ");
 		DHKeyExchanger dhAlice = new DHKeyExchanger(11, 2);
@@ -22,12 +25,11 @@ public class MessageExchanger
 		DHKeyExchanger dhBob = new DHKeyExchanger(11, 2);
 		
 		
-		int aliceKey = dhAlice.getSecretKey(dhBob.getPublicKey());
-		int bobKey = dhBob.getSecretKey(dhAlice.getPublicKey());
+		long aliceKey = dhAlice.getSecretKey(dhBob.getPublicKey());
+		long bobKey = dhBob.getSecretKey(dhAlice.getPublicKey());
 		
 		if(aliceKey != bobKey) throw new Exception("Secret keys are not the same");
 		
 		System.out.println("Secret Key: " + aliceKey);
-		System.out.println("End of Exercise");
 	}
 }
