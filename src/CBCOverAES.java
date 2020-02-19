@@ -1,9 +1,10 @@
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 
 import javax.crypto.spec.IvParameterSpec;
+
 
 public class CBCOverAES
 {
@@ -16,13 +17,20 @@ public class CBCOverAES
 		this.key = key;
 	}
 	
-	public String encrypt(String message) throws UnsupportedEncodingException
+	public byte[] encrypt(String message) throws UnsupportedEncodingException
 	{
-		String ciphertext = "";
 		byte[] plaintext = message.getBytes("UTF-8");
+		ArrayList<Byte> ciphertext = new ArrayList<Byte>();
+		
 		byte[] ivCopy = iv;
-				
-		System.out.println("LENGTH:" + plaintext.length);
+		byte[] resultBytes = null;
+		
+		if(plaintext.length < 16)// padding for input
+		{
+			plaintext = addPadding(plaintext);
+		}
+		
+//		System.out.println("PLAINTEXT BYTES: " + Arrays.toString(plaintext));
 		
 		for (int i = 0; i < plaintext.length; i += 16)
 		{
@@ -31,79 +39,141 @@ public class CBCOverAES
 			
 			for (int j = i; j < i + 16; j++) // Create block
 			{
-				block[j % 16] = plaintext[j];
+				if (j >= plaintext.length)
+				{
+					block[j % 16] = 0;
+				}
+				else 
+				{
+					block[j % 16] = plaintext[j];
+				}
 			}
 			
-//			System.out.println("BLOCK: " + Arrays.toString(block));
+			if(block.length < 16)// padding for block
+			{
+				block = addPadding(block);
+			}
+			
 			
 			xorText = xorArrays(block, ivCopy); //XOR with initial vector
-//			System.out.println("xorText size: " + xorText.length);
 			
-			String result = AES.encrypt(xorText, key);
-			ciphertext += result;
-			ivCopy = result.getBytes();// TODO: At this point, my iv becomes larger due to large result coming from AES
+			resultBytes = AES.encrypt(xorText, key);
 			
-//			System.out.println("result sizE: " + ivCopy.length);
-//			System.out.println(result);
-//			System.out.println("DECRYPTED:" + AES.decrypt(result, key));
-//			System.out.println("-------------------------------");
+			for (int j = 0; j < resultBytes.length; j++)
+			{
+				ciphertext.add(resultBytes[j]);
+			}
+			
+			ivCopy = resultBytes;
 		}
 		
-		return ciphertext;
+		return toPrimitiveBytes(ciphertext.toArray());
 	}
 	
-	public String decrypt(String message) throws UnsupportedEncodingException
+	public byte[] decrypt(byte[] message) throws UnsupportedEncodingException
 	{
-		String plaintext = "";
-		byte[] ciphertext = message.getBytes("UTF-8");
+		ArrayList<Byte> plaintext = new ArrayList<Byte>();
+		byte[] ciphertext = message;
 		byte[] ivCopy = iv;
+		byte[] xorText = null;
 		
-		System.out.println("CYPHER LENGTH:" + ciphertext.length);
-
 		for (int i = 0; i < ciphertext.length; i += 16)
 		{
 			byte[] block = new byte[16];
-			byte[] xorText = new byte[16];
-			byte[] decryptedBlock = new byte[16];
-			
+			byte[] resultBytes;
+			xorText = new byte[16];
+
 			for (int j = i; j < i + 16; j++) // Create block
 			{
-				block[j % 16] = ciphertext[j];
+				if (j >= ciphertext.length)
+				{
+					block[j % 16] = 0;
+				}
+				else 
+				{
+					block[j % 16] = ciphertext[j];
+				}
 			}
 			
-			String blockText = Base64.getEncoder().encodeToString(block);
-			String decrypted = AES.decrypt(blockText, key);
-			decryptedBlock = decrypted.getBytes();
+			resultBytes = AES.decrypt(block, key);
 			
-//			xorText = xorArrays(decryptedBlock, ivCopy);
-			plaintext += xorText;
+			xorText = xorArrays(resultBytes, ivCopy);
+						
+			for (int j = 0; j < xorText.length; j++)
+			{
+				plaintext.add(xorText[j]);
+			}
+			
 			ivCopy = block;
 		}
 		
-		
-		return plaintext;
+		return toPrimitiveBytes(plaintext.toArray());
 	}
 	
+	/**
+	 * Perform logical XOR operation on the given byte arrays.
+	 * @param a - byte array #1
+	 * @param b - byte array #2
+	 * @return A new array containing the result of the XOR operation.
+	 */
 	private byte[] xorArrays(byte[] a, byte[] b)
 	{
-		System.out.println(a.length + " .XOR. " + b.length);
 		byte[] c = new byte[a.length];
 		
 		for (int i = 0; i < a.length; i++)
 		{
 			byte bt = a[i];
 			byte v = b[i];
-			
-//			System.out.print(bt + " XOR " + v + " = ");
-			
+						
 			c[i] = (byte) (bt ^ v);
-			
-//			System.out.println(c[i]);
 		}
 		
 		return c;
 	}
 	
+	/**
+	 * Appends zeros to the end of the given array.
+	 * @param array
+	 * @return
+	 */
+	private byte[] addPadding(byte[] array)
+	{
+		byte[] padded = new byte[16];
+		
+		for (int i = 0; i < 16; i++)
+		{
+			if(i >= array.length)
+			{
+				padded[i] = 0;
+			}
+			else
+			{
+				padded[i] = array[i];
+			}
+		}
+		
+		return padded;
+	}
+	
+	/**
+	 * Converts Object[] (which is actually expected to be Bytes[]) to byte[].
+	 * @param arr - array of Bytes
+	 */
+	private byte[] toPrimitiveBytes(Object[] arr)
+	{	
+		byte[] result = new byte[arr.length];
+		
+		for (int i = 0; i < arr.length; i++)
+		{
+			result[i] = (byte) arr[i];
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Returns the Initial Vector used for the Cipher Block Chaining algorithm.
+	 */
 	public static String getInitVector()
 	{
 		return Arrays.toString(iv);
