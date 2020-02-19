@@ -14,7 +14,6 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AES
 {
-	
 	private static SecretKeySpec secretKey;
 	private static byte[] key;
 	

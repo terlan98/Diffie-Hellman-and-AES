@@ -1,14 +1,9 @@
 import java.util.Random;
 
-/**
- * 
- * <div style = "color: red"> TEST </div> 
- *
- */
 public class DHKeyExchanger
 {
-	private long p, alpha;
-	private long publicKey, privateKey;
+	private int p, alpha;
+	private int publicKey, privateKey;
 	private Random rnd = new Random();
 	
 	public DHKeyExchanger(int p, int alpha)
@@ -17,9 +12,8 @@ public class DHKeyExchanger
 		this.p = p;
 		
 		privateKey = rnd.nextInt(p);
-		publicKey = (long) (Math.pow(alpha, privateKey) % p);
+		publicKey =  (int) (Math.pow(alpha, privateKey) % p);
 		
-		System.out.println("Private Key: " + privateKey + " Public Key: " + publicKey);
 	}
 	
 	public long getSecretKey(long publicKey)
@@ -31,5 +25,9 @@ public class DHKeyExchanger
 	{
 		return publicKey;
 	}
-	
+
+	public int getPrivateKey()
+	{
+		return privateKey;
+	}
 }
