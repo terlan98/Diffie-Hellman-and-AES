@@ -5,18 +5,30 @@ import java.util.Arrays;
 
 import javax.crypto.spec.IvParameterSpec;
 
-
+/**
+ * Performs Cipher Block Chaining mode AES encryption and decryption.
+ */
 public class CBCOverAES
 {
 	private static SecureRandom rnd = new SecureRandom();
 	private static byte[] iv = new IvParameterSpec(rnd.generateSeed(16)).getIV();
 	private String key;
 	
+	/**
+	 * Creates an instance of CBCOverAES with the given key.
+	 * @param key
+	 */
 	public CBCOverAES(String key)
 	{
 		this.key = key;
 	}
 	
+	/**
+	 * Encrypts the given String.
+	 * @param message - String to be encrypted
+	 * @return Encrypted byte array
+	 * @throws UnsupportedEncodingException
+	 */
 	public byte[] encrypt(String message) throws UnsupportedEncodingException
 	{
 		byte[] plaintext = message.getBytes("UTF-8");
@@ -29,9 +41,7 @@ public class CBCOverAES
 		{
 			plaintext = addPadding(plaintext);
 		}
-		
-//		System.out.println("PLAINTEXT BYTES: " + Arrays.toString(plaintext));
-		
+				
 		for (int i = 0; i < plaintext.length; i += 16)
 		{
 			byte[] block = new byte[16];
@@ -70,6 +80,12 @@ public class CBCOverAES
 		return toPrimitiveBytes(ciphertext.toArray());
 	}
 	
+	/**
+	 * Decrypts the given byte array.
+	 * @param message - byte array to be encrypted
+	 * @return Decrypted byte array
+	 * @throws UnsupportedEncodingException
+	 */
 	public byte[] decrypt(byte[] message) throws UnsupportedEncodingException
 	{
 		ArrayList<Byte> plaintext = new ArrayList<Byte>();
@@ -156,7 +172,7 @@ public class CBCOverAES
 	}
 	
 	/**
-	 * Converts Object[] (which is actually expected to be Bytes[]) to byte[].
+	 * Converts Object[] (which is actually expected to be Byte[]) to byte[].
 	 * @param arr - array of Bytes
 	 */
 	private byte[] toPrimitiveBytes(Object[] arr)
