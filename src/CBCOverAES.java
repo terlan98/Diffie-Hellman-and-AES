@@ -11,6 +11,7 @@ import javax.crypto.spec.IvParameterSpec;
 public class CBCOverAES
 {
 	private static SecureRandom rnd = new SecureRandom();
+	/**A randomly-generated initial vector */
 	private static byte[] iv = new IvParameterSpec(rnd.generateSeed(16)).getIV();
 	private String key;
 	
@@ -37,39 +38,38 @@ public class CBCOverAES
 		byte[] ivCopy = iv;
 		byte[] resultBytes = null;
 		
-		if(plaintext.length < 16)// padding for input
+		if(plaintext.length < 16) // padding for input
 		{
 			plaintext = addPadding(plaintext);
 		}
-				
+		
 		for (int i = 0; i < plaintext.length; i += 16)
 		{
 			byte[] block = new byte[16];
 			byte[] xorText = new byte[16];
 			
-			for (int j = i; j < i + 16; j++) // Create block
+			for (int j = i; j < i + 16; j++) // Create a block
 			{
 				if (j >= plaintext.length)
 				{
 					block[j % 16] = 0;
 				}
-				else 
+				else
 				{
 					block[j % 16] = plaintext[j];
 				}
 			}
 			
-			if(block.length < 16)// padding for block
+			if(block.length < 16) // padding for block
 			{
 				block = addPadding(block);
 			}
 			
-			
-			xorText = xorArrays(block, ivCopy); //XOR with initial vector
+			xorText = xorArrays(block, ivCopy); // XOR with the initial vector
 			
 			resultBytes = AES.encrypt(xorText, key);
 			
-			for (int j = 0; j < resultBytes.length; j++)
+			for (int j = 0; j < resultBytes.length; j++) // append the obtained result to ciphertext
 			{
 				ciphertext.add(resultBytes[j]);
 			}
@@ -99,7 +99,7 @@ public class CBCOverAES
 			byte[] resultBytes;
 			xorText = new byte[16];
 
-			for (int j = i; j < i + 16; j++) // Create block
+			for (int j = i; j < i + 16; j++) // Create a block
 			{
 				if (j >= ciphertext.length)
 				{
@@ -113,9 +113,9 @@ public class CBCOverAES
 			
 			resultBytes = AES.decrypt(block, key);
 			
-			xorText = xorArrays(resultBytes, ivCopy);
+			xorText = xorArrays(resultBytes, ivCopy); // XOR with the initial vector
 						
-			for (int j = 0; j < xorText.length; j++)
+			for (int j = 0; j < xorText.length; j++) // append the obtained result to plaintext
 			{
 				plaintext.add(xorText[j]);
 			}

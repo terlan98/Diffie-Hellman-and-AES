@@ -18,7 +18,8 @@ public class AES
 	private static byte[] key;
 	
 	/**
-	 * Sets the key for the AES algorithm.
+	 * Sets the key for the AES-128 algorithm.\n
+	 * Padding is applied if the key is less than 16 bytes.
 	 * @param myKey
 	 */
 	public static void setKey(String myKey)
