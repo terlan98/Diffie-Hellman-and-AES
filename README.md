@@ -11,4 +11,4 @@ This java application imitates a message exchange between two parties using Diff
 
 The initial vector is generated randomly and changes every time the program starts.
 
-**NOTE:** It is assumed that *p* and *alpha* are not big. Using big values will cause the Math.pow() function used in DHKeyExchanger to behave unexpectedly and will result in unsuccessful key exchange. This problem can be solved using BigInteger class. However, since the assignment description states that the values should be kept low we decided not to bother moving from primitive types to BigInteger.
+**NOTE:** It is assumed that *p* and *alpha* are not big. Using big values will cause the Math.pow() function used in DHKeyExchanger to behave unexpectedly and will result in an unsuccessful key exchange. This problem can be solved using BigInteger class. However, since the assignment description states that the values should be kept low, we decided not to bother moving from primitive types to BigInteger.
