@@ -31,11 +31,11 @@ public class MessageExchanger
 		System.out.println("\nBob's Private Key: " + dhBob.getPrivateKey() + "\nBob's Public Key: " + dhBob.getPublicKey());
 		
 		//-------Getting the secret key-------
-		int aliceKey = dhAlice.getSecretKey(dhBob.getPublicKey());
-		int bobKey = dhBob.getSecretKey(dhAlice.getPublicKey());
+		long aliceKey = dhAlice.getSecretKey(dhBob.getPublicKey());
+		long bobKey = dhBob.getSecretKey(dhAlice.getPublicKey());
 		
 		if (aliceKey != bobKey)
-			System.err.println("Secret keys are not the same");
+			System.err.println("Secret keys are not the same. Probably your p and alpha are big enough to confuse the Math.pow() function used in DHKeyExchanger class");
 		
 		System.out.println("\nSecret Key: " + aliceKey); 
 		System.out.println("----------------------------------------");
